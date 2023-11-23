@@ -1,27 +1,48 @@
 using Plots
 using BEMT
 
-chord = 0.1
-radius = 2
-nb = 3
+diameter = 25.40e-2
+radius = diameter/2
+chord = 0.15*radius
+nb = 2
+rpm = 3000
+omega = rpm*(2π/60)
+T = 1.82
+v_tip = omega*radius
+# J = V/(nD) # n in rev/sec
+n = rpm*(1/60)
+J = 0.6
+vc = J*n*diameter
+# vc = 100
+
+ρ = 1.225
 σ = sigma(chord, radius, nb)
 
-phi(r, vc, vi, rpm, R) = atan((vc + vi)/(0.10472*rpm*r*R))
-lambda(r, vc, vi, rpm, R) = phi(r, vc, vi, rpm, R)*r
-slope(r) = 2π
+induced_velocity(Vc, T, ρ, A) = -Vc/2 + sqrt(Vc/2^2 + T/(2*ρ*A))
+area(r) = r^2*π
+phi(r, vc, vi, rpm) = atan((vc + vi)/((2π/60)*rpm*r))
+lambda(r, vc, vi, rpm) = phi(r, vc, vi, rpm)*r
+slope(r) = 2π*r
 pitch(r, at, ar) = deg2rad(at) - deg2rad(at - ar)*(r)
 
-r = [0.0:0.01:1.0;]
-λ = lambda.(r, 0.0, 0.2, 500, 2)
-ϕ = phi.(r,  0.0, 0.2, 500, 2)
+vi = induced_velocity(u, T, ρ, area(radius))
+r = [0.25:0.01:1.0;]
+λ = lambda.(r, vc, vi, rpm)
+ϕ = phi.(r,  vc, vi, rpm)
 a = slope.(r)
-θ = pitch.(r, 10, 0)
+θ = pitch.(r, 45, 10)
+sig = solidity(r)
 
+dCt = thrust_coefficient.(σ, a, θ, r, λ)
+Ct = integrate(dCt, r)
+T = integrate(dCt, r)*area(radius)*ρ*v_tip^2
+CtUI = T/(ρ*n^2*(diameter)^4)
 
-Ct, dT = thrust_coefficient(r, σ, a, θ, λ)
-
-plot(r, rad2deg.(ϕ))
-plot(r, rad2deg.(θ))
-plot(r, λ)
-plot(r, dT)
-Ct
+# plot(r, dCt)
+# scatter([J], [CtUI], label="$rpm")
+scatter!([J], [CtUI], label=:none)
+# scatter([vc], [T], label=:none)
+# scatter!([vc], [T], label=:none)
+# scatter([rpm], [T], label="$rpm")
+# plot(r, rad2deg.(ϕ))
+# plot(r, λ)
