@@ -3,10 +3,10 @@ using BEMT
 
 file = "naca001264-il-200000-n5.csv"
 cl, cd = load_aerofoil(file; startline=12)
-a = [-2:0.01:2;]
+a = [-0.22:0.001:0.22;]
 
-plot(a, cl.(a))
-plot!(a, cd.(a))
+plot(rad2deg.(a), cl.(a))
+plot!(rad2deg.(a), cd.(a))
 
 diameter = 25.40e-2
 radius = diameter/2
@@ -37,7 +37,7 @@ r = [0.25:0.01:1.0;]
 λ = lambda.(r, vc, vi, rpm)
 ϕ = phi.(r,  vc, vi, rpm)
 a = slope.(r)
-θ = pitch.(r, 15, 5)
+θ = pitch.(r, 12, 10)
 sig = solidity(r)
 
 dCt = thrust_coefficient.(σ, a, θ, r, λ)
