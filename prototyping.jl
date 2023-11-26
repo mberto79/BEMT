@@ -1,6 +1,13 @@
 using Plots
 using BEMT
 
+file = "naca001264-il-200000-n5.csv"
+cl, cd = load_aerofoil(file; startline=12)
+a = [-2:0.01:2;]
+
+plot(a, cl.(a))
+plot!(a, cd.(a))
+
 diameter = 25.40e-2
 radius = diameter/2
 chord = 0.15*radius
@@ -25,18 +32,22 @@ lambda(r, vc, vi, rpm) = phi(r, vc, vi, rpm)*r
 slope(r) = 2π*r
 pitch(r, at, ar) = deg2rad(at) - deg2rad(at - ar)*(r)
 
-vi = induced_velocity(u, T, ρ, area(radius))
+vi = induced_velocity(vc, T, ρ, area(radius))
 r = [0.25:0.01:1.0;]
 λ = lambda.(r, vc, vi, rpm)
 ϕ = phi.(r,  vc, vi, rpm)
 a = slope.(r)
-θ = pitch.(r, 45, 10)
+θ = pitch.(r, 15, 5)
 sig = solidity(r)
 
 dCt = thrust_coefficient.(σ, a, θ, r, λ)
 Ct = integrate(dCt, r)
 T = integrate(dCt, r)*area(radius)*ρ*v_tip^2
 CtUI = T/(ρ*n^2*(diameter)^4)
+
+α = θ .- ϕ
+dCt_new = get_thrust.(cl.(α), cd.(α), σ, ϕ, r)
+T_new = integrate(dT, r)*area(radius)*ρ*v_tip^2
 
 # plot(r, dCt)
 # scatter([J], [CtUI], label="$rpm")
@@ -46,3 +57,5 @@ scatter!([J], [CtUI], label=:none)
 # scatter([rpm], [T], label="$rpm")
 # plot(r, rad2deg.(ϕ))
 # plot(r, λ)
+plot(r, dCt)
+plot!(r, dCt_new)

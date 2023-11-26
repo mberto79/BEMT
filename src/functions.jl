@@ -1,4 +1,12 @@
-export sigma, thrust_coefficient, integrate
+export load_aerofoil, sigma, thrust_coefficient, integrate, get_thrust
+
+load_aerofoil(file; startline=0) = begin
+    data = readdlm(file, ',', Float64, skipstart=startline-1)
+    alpha = deg2rad.(data[:,1])
+    cl = Spline1D(alpha, data[:,2]) # generate cl fit
+    cd = Spline1D(alpha, data[:,3]) # generate cd fit
+    cl, cd
+end
 
 sigma(chord, radius, nb) = begin
     nb*chord/(π*radius)
@@ -15,5 +23,9 @@ end
 
 thrust_coefficient(σ, a, θ, r, λ) = begin
     (σ/2)*a*(θ*r^2 - λ*r)
+end
+
+get_thrust(cl, cd, σ, ϕ, r) = begin
+    (σ/2)*(cl*cos(ϕ) - cd*sin(ϕ))*r^2
 end
 
