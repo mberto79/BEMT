@@ -12,14 +12,19 @@ sigma(chord, radius, nb) = begin
     nb*chord/(π*radius)
 end
 
-integrate(fx, x) = begin
-    n = length(fx)
-    sum = zero(Float64)
-    for i ∈ 1:(n-1)
-        sum += 0.5*(fx[i] + fx[i+1])*(x[i+1] - x[i])
-    end
-    sum 
+# Induced angle
+phi(r, vi, vc, rpm) = atan((vc + vi)/((2π/60)*rpm*r))
+
+# True velocity 
+U_inf(r, vi, vc, rpm) = sqrt( (vc + vi)^2 + ((2π/60)*rpm*r)^2 )
+
+# Lift and drag forces 
+aerofoil_forces(ρ, U_inf, cl, cd, c, dr) = begin
+    lift = 0.5*ρ*U_inf^2*c*cl*dr
+    drag = 0.5*ρ*U_inf^2*c*cd*dr
+    lift, drag
 end
+
 
 thrust_coefficient(σ, a, θ, r, λ) = begin
     (σ/2)*a*(θ*r^2 - λ*r)
@@ -33,4 +38,13 @@ thrust(cl, cd, r) = begin
     ϕ = atan((vc + vi)/((2π/60)*rpm*r))
     u_inf = sqrt( (rpm*y*2π/60)^2 + (Vc + Vi)^2 )
     (cl*cos(ϕ) - cd*sin(ϕ))*(0.5*ρ*u_inf^2*area)
+end
+
+integrate(fx, x) = begin
+    n = length(fx)
+    sum = zero(Float64)
+    for i ∈ 1:(n-1)
+        sum += 0.5*(fx[i] + fx[i+1])*(x[i+1] - x[i])
+    end
+    sum 
 end
