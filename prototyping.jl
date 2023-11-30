@@ -14,7 +14,7 @@ chord = 0.15*radius
 nb = 2
 rpm = 3000
 omega = rpm*(2π/60)
-T = 1.82
+T = 3.5
 v_tip = omega*radius
 # J = V/(nD) # n in rev/sec
 n = rpm*(1/60)
@@ -37,24 +37,24 @@ r = [0.25:0.01:1.0;]
 λ = lambda.(r, vc, vi, rpm)
 ϕ = phi.(r,  vc, vi, rpm)
 a = slope.(r)
-θ = pitch.(r, 12, 10)
-sig = solidity(r)
+θ = pitch.(r, 5, 2)
+# sig = solidity(r)
 
 dCt = thrust_coefficient.(σ, a, θ, r, λ)
 Ct = integrate(dCt, r)
 T = integrate(dCt, r)*area(radius)*ρ*v_tip^2
 CtUI = T/(ρ*n^2*(diameter)^4)
 
-thrust.(vc, vi, rpm, r, θ, cl, cd, ρ) 
-T_new = integrate(dT, r)*area(radius)*ρ*v_tip^2
+U_corr = zeros(length(r))
+alpha = zeros(length(r))
+alphai = zeros(length(r))
 
-# plot(r, dCt)
-# scatter([J], [CtUI], label="$rpm")
-scatter!([J], [CtUI], label=:none)
-# scatter([vc], [T], label=:none)
-# scatter!([vc], [T], label=:none)
-# scatter([rpm], [T], label="$rpm")
-# plot(r, rad2deg.(ϕ))
-# plot(r, λ)
-plot(r, dCt)
-plot!(r, dCt_new)
+alphai .= induced_angle.(vc, vi, rpm, r) 
+U_corr .= corrected_velocity.(vc, vi, rpm, r)
+alpha .= θ .- alphai
+dT = thrust_element.(cl.(alpha), cd.(alpha), chord, U_corr, alphai, ρ)
+dTm = thrust_momentum.(vc, vi, r, ρ)
+T_new = integrate(dT, r)
+
+plot(r, dT)
+plot!(r, dTm)

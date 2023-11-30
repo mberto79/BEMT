@@ -1,4 +1,6 @@
-export load_aerofoil, sigma, thrust_coefficient, integrate, thrust
+export load_aerofoil, sigma, thrust_coefficient, integrate
+export induced_angle, corrected_velocity
+export thrust_element, thrust_momentum
 
 load_aerofoil(file; startline=0) = begin
     data = readdlm(file, ',', Float64, skipstart=startline-1)
@@ -33,14 +35,21 @@ get_thrust(cl, cd, σ, ϕ, r) = begin
     (σ/2)*(cl*cos(ϕ) - cd*sin(ϕ))*r^2
 end
 
-thrust(vc, vi, rpm, r, theta, cl, cd, ρ) = begin
-    phi = atan((vc + vi)/((2π/60)*rpm*r))
-    alpha = theta - phi
-    U_corr = sqrt( (vc + vi)^2 + ((2π/60)*rpm*r)^2 )
+induced_angle(vc, vi, rpm, r) = begin
+    atan((vc + vi)/((2π/60)*rpm*r))
+end
+
+corrected_velocity(vc, vi, rpm, r) = begin
+    sqrt( (vc + vi)^2 + ((2π/60)*rpm*r)^2 )
+end
+
+thrust_element(cl, cd, c, U_corr, phi, ρ) = begin
     qA = 0.5*ρ*U_corr^2*c # (c*dr)
-    lift = qA*cl(alpha)
-    drag = qA*cd(alpha)
-    lift*cos(phi) - drag*sin(phi)
+    ( cl*cos(phi) - cd*sin(phi) )*qA
+end
+
+thrust_momentum(vc, vi, r, ρ) = begin
+    4*π*ρ*(vc + vi)*vi*r # (rdr)
 end
 
 integrate(fx, x) = begin
