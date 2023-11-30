@@ -29,3 +29,8 @@ get_thrust(cl, cd, σ, ϕ, r) = begin
     (σ/2)*(cl*cos(ϕ) - cd*sin(ϕ))*r^2
 end
 
+thrust(cl, cd, r) = begin
+    ϕ = atan((vc + vi)/((2π/60)*rpm*r))
+    u_inf = sqrt( (rpm*y*2π/60)^2 + (Vc + Vi)^2 )
+    (cl*cos(ϕ) - cd*sin(ϕ))*(0.5*ρ*u_inf^2*area)
+end
