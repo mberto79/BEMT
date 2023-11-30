@@ -45,8 +45,7 @@ Ct = integrate(dCt, r)
 T = integrate(dCt, r)*area(radius)*ρ*v_tip^2
 CtUI = T/(ρ*n^2*(diameter)^4)
 
-α = θ .- ϕ
-dCt_new = get_thrust.(cl.(α), cd.(α), σ, ϕ, r)
+thrust.(vc, vi, rpm, r, θ, cl, cd, ρ) 
 T_new = integrate(dT, r)*area(radius)*ρ*v_tip^2
 
 # plot(r, dCt)
