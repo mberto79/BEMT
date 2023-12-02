@@ -85,18 +85,20 @@ secant_solver(func, funcValue, g1, g2; tol=1e-8)
 Find the value x for which a function `func` will return the target value `funcValue`, given lower and upper guesses, `g1` and `g2` to an absolute tolerance `tol` (set to 1e-8 as default)
 """
 function secant_solver(
-    func, funcValue; tol::T=1e-8, guess_range::Tuple{T,T}=(), args=(), show=false) where T<:Number
+    func, funcValue; 
+    guess_range::Tuple{T,T}=(), args=(), tol::T=1e-8, trials::I=10,show=false
+    ) where {T<:Number,I<:Integer}
     
     g1, g2 = guess_range
-    g = g1:g2/10:g2
+    g = g1:g2/trials:g2
     fg = zeros(length(g))
     for i ∈ eachindex(fg)
         fg[i] = func(g[i], args...,) - funcValue
     end
     # fg = func.(g, args...,) .- funcValue
-    I = sortperm(fg)
-    g1 = g[I[1]]
-    g2 = g[I[2]]
+    idx = sortperm(fg)
+    g1 = g[idx[1]]
+    g2 = g[idx[2]]
 
     f1 = func(g1, args...,) - funcValue
     f2 = func(g2, args...,) - funcValue
