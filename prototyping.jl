@@ -24,8 +24,7 @@ vc = J*n*diameter
 
 
 r = radius.*[0.25:0.01:1.0;]
-θ = linear_twist.(r, 15, 2)
-vi = 0.005
+θ = linear_twist(15, 2)
 
 vi = similar(r)
 
@@ -34,7 +33,7 @@ blade_vi(vi, vc, rpm, r, θ, cl, cd, chord) = begin
 end
 
 @time for i ∈ eachindex(r)
-    args = (vc, rpm, r[i], θ[i], cl, cd, chord)
+    args = (vc, rpm, r[i], θ, cl, cd, chord)
     vi[i] = secant_solver(
         blade_vi, 0.0, guess_range=(0.0, v_tip/2), args=args)
 end
@@ -42,7 +41,7 @@ end
 
 alphai = induced_angle.(vc, vi, rpm, r) 
 U_corr = corrected_velocity.(vc, vi, rpm, r)
-alpha = θ .- alphai
+alpha = θ.(r) .- alphai
 dT = thrust_element.(cl.(alpha), cd.(alpha), chord, U_corr, alphai, ρ)
 dTm = thrust_momentum.(vc, vi, r, ρ)
 thrust = integrate(dT, r)
