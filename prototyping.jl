@@ -28,10 +28,15 @@ r = radius.*[0.25:0.01:1.0;]
 vi = 0.005
 
 vi = similar(r)
-for i ∈ eachindex(r)
-    args = (vc, rpm, r[i], θ[i], cl, cd, chord, ρ)
+
+blade_vi(vi, vc, rpm, r, θ, cl, cd, chord) = begin
+    element_momentum_balance(vc, vi, rpm, r, θ, cl, cd, chord)
+end
+
+@time for i ∈ eachindex(r)
+    args = (vc, rpm, r[i], θ[i], cl, cd, chord)
     vi[i] = secant_solver(
-        element_momentum_balance, 0.0, 0.0, v_tip/2, args=args)
+        blade_vi, 0.0, guess_range=(0.0, v_tip/2), args=args)
 end
 
 
@@ -42,8 +47,12 @@ dT = thrust_element.(cl.(alpha), cd.(alpha), chord, U_corr, alphai, ρ)
 dTm = thrust_momentum.(vc, vi, r, ρ)
 thrust = integrate(dT, r)
 
-# plot(r, dT)
-# plot!(r, dTm)
-# plot(r, vi)
+plot(r, dT)
+plot!(r, dTm)
+plot!(r, vi)
 
 scatter!([J], [thrust], label="J = $J")
+
+a = (1,2)
+
+g1, g2 = a

@@ -58,12 +58,15 @@ thrust_momentum(vc, vi, r, ρ) = begin
     4*π*ρ*(vc + vi)*vi*r # (rdr)
 end
 
-element_momentum_balance(vi, vc, rpm, r, θ, cl, cd, chord, ρ) = begin
-    ϕ = induced_angle(vc, vi, rpm, r) 
-    U_corr = corrected_velocity(vc, vi, rpm, r)
+element_momentum_balance(vc, vi, rpm, r, θ, cl, cd, chord) = begin
+    Ω = (2π/60)*rpm
+    U_r = Ω*r
+    ϕ = atan((vc + vi)/U_r) 
+    U_corr = sqrt( (vc + vi)^2 + (U_r)^2 )
     α = θ - ϕ
-    Te = thrust_element(cl(α), cd(α), chord, U_corr, ϕ, ρ)
-    Tm = thrust_momentum(vc, vi, r, ρ)
+    qA = 0.5*U_corr^2*chord # (*dr)
+    Te =( cl(α)*cos(ϕ) - cd(α)*sin(ϕ) )*qA
+    Tm = 4*π*(vc + vi)*vi*r # (*dr)
     Te - Tm
 end
 
@@ -82,9 +85,10 @@ secant_solver(func, funcValue, g1, g2; tol=1e-8)
 Find the value x for which a function `func` will return the target value `funcValue`, given lower and upper guesses, `g1` and `g2` to an absolute tolerance `tol` (set to 1e-8 as default)
 """
 function secant_solver(
-    func, funcValue, g1, g2; tol=1e-8, args=(), show=false)
+    func, funcValue; tol::T=1e-8, guess_range::Tuple{T,T}=(), args=(), show=false) where T<:Number
     
-    g = [g1:g2/10:g2;]
+    g1, g2 = guess_range
+    g = g1:g2/10:g2
     fg = zeros(length(g))
     for i ∈ eachindex(fg)
         fg[i] = func(g[i], args...,) - funcValue
