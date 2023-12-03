@@ -17,14 +17,18 @@ omega = rpm*(2π/60)
 v_tip = omega*radius
 # J = V/(nD) # n in rev/sec
 n = rpm*(1/60)
-J = 0.6
+J = 0.0
 vc = J*n*diameter
 # vc = 0
 ρ = 1.225
 
 
-r = radius.*[0.25:0.01:1.0;]
-θ = linear_twist(15, 2)
+n = 75
+delta = radius/n
+r = [delta/2:delta:radius-delta/2;]
+scatter(r,r, xlims=(0, radius), ylims=(0,radius))
+θ = linear_twist(15, 2, radius)
+plot(r, rad2deg.(θ.(r)))
 
 vi = similar(r)
 
@@ -48,7 +52,7 @@ thrust = integrate(dT, r)
 
 plot(r, dT)
 plot!(r, dTm)
-plot!(r, vi)
+plot(r, vi)
 
 scatter!([J], [thrust], label="J = $J")
 
