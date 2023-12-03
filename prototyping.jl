@@ -27,7 +27,7 @@ n = 75
 delta = radius/n
 r = [delta/2:delta:radius-delta/2;]
 scatter(r,r, xlims=(0, radius), ylims=(0,radius))
-θ = linear_twist(15, 2, radius)
+θ = linear_twist(15, 5, radius)
 plot(r, rad2deg.(θ.(r)))
 
 vi = similar(r)
@@ -46,9 +46,9 @@ end
 alphai = induced_angle.(vc, vi, rpm, r) 
 U_corr = corrected_velocity.(vc, vi, rpm, r)
 alpha = θ.(r) .- alphai
-dT = thrust_element.(cl.(alpha), cd.(alpha), chord, U_corr, alphai, ρ)
-dTm = thrust_momentum.(vc, vi, r, ρ)
-thrust = integrate(dT, r)
+dT = thrust_element.(cl.(alpha), cd.(alpha), chord, U_corr, alphai, ρ)*delta
+dTm = thrust_momentum.(vc, vi, r, ρ)*delta
+thrust = integrate(dT, r)/delta
 
 plot(r, dT)
 plot!(r, dTm)
