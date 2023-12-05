@@ -13,12 +13,9 @@ load_aerofoil(file; startline=0) = begin
 end
 
 linear_twist(a_root, a_tip, radius) = begin
-    # deg2rad(a_root) - deg2rad(a_root - a_tip)*(r)
     k1 = deg2rad(a_root)
     k2 = deg2rad(a_tip)
-    function twist(r)
-        k1 + (k2 - k1)/radius*r
-    end
+    (r) -> k1 + (k2 - k1)/radius*r
 end
 
 sigma(chord, radius, nb) = begin
