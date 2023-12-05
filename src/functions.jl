@@ -66,9 +66,9 @@ element_momentum_balance(vc, vi, rpm, r, θ, cl, cd, chord) = begin
     ϕ = atan((vc + vi)/U_r) 
     U_corr = sqrt( (vc + vi)^2 + (U_r)^2 )
     α = θ(r) - ϕ
-    qA = 0.5*U_corr^2*chord # (*dr)
+    qA = 0.5*U_corr^2*chord # (ρ*dr) missing
     Te =( cl(α)*cos(ϕ) - cd(α)*sin(ϕ) )*qA
-    Tm = 4*π*(vc + vi)*vi*r # (*dr)
+    Tm = 4*π*(vc + vi)*vi*r # (ρ*dr) missing
     Te - Tm
 end
 
