@@ -51,23 +51,23 @@ corrected_velocity(vc, vi, rpm, r) = begin
     sqrt( (vc + vi)^2 + ((2π/60)*rpm*r)^2 )
 end
 
-thrust_element(cl, cd, c, U_corr, phi, ρ) = begin
+thrust_element(cl, cd, c, U_corr, phi, ρ,nb) = begin
     qA = 0.5*ρ*U_corr^2*c # (c*dr)
-    ( cl*cos(phi) - cd*sin(phi) )*qA
+    ( cl*cos(phi) - cd*sin(phi) )*qA*nb
 end
 
 thrust_momentum(vc, vi, r, ρ) = begin
     4*π*ρ*(vc + vi)*vi*r # (rdr)
 end
 
-trust_balance(vi, vc, rpm, r, θ, cl, cd, chord) = begin
+trust_balance(vi, vc, rpm, r, θ, cl, cd, chord, nb) = begin
     Ω = (2π/60)*rpm
     U_r = Ω*r
     ϕ = atan((vc + vi)/U_r) 
     U_corr = sqrt( (vc + vi)^2 + (U_r)^2 )
     α = θ(r) - ϕ
     qA = 0.5*U_corr^2*chord # (ρ*dr) missing
-    Te =( cl(α)*cos(ϕ) - cd(α)*sin(ϕ) )*qA
+    Te =( cl(α)*cos(ϕ) - cd(α)*sin(ϕ) )*qA*nb
     Tm = 4*π*(vc + vi)*vi*r # (ρ*dr) missing
     Te - Tm
 end
