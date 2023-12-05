@@ -34,7 +34,7 @@ plot(r, rad2deg.(θ.(r)))
 vi = similar(r)
 
 @time for i ∈ eachindex(r)
-    args = (vc, rpm, r[i], θ, cl, cd, chord)
+    args = (vc, rpm, r[i], θ, cl, cd, chord, nb)
     vi[i] = secant_solver(
         trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args)
 end
@@ -43,7 +43,7 @@ end
 alphai = induced_angle.(vc, vi, rpm, r) 
 U_corr = corrected_velocity.(vc, vi, rpm, r)
 alpha = θ.(r) .- alphai
-dT = thrust_element.(cl.(alpha), cd.(alpha), chord, U_corr, alphai, ρ)*delta
+dT = thrust_element.(cl.(alpha), cd.(alpha), chord, U_corr, alphai, ρ, nb)*delta
 dTm = thrust_momentum.(vc, vi, r, ρ)*delta
 thrust = integrate(dT, r)/delta
 
