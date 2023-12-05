@@ -26,20 +26,17 @@ vc = J*n*diameter
 n = 75
 delta = radius/n
 r = [delta/2:delta:radius-delta/2;]
+r = [0.0:delta:radius;]
 scatter(r,r, xlims=(0, radius), ylims=(0,radius))
 θ = linear_twist(15, 5, radius)
 plot(r, rad2deg.(θ.(r)))
 
 vi = similar(r)
 
-blade_vi(vi, vc, rpm, r, θ, cl, cd, chord) = begin
-    element_momentum_balance(vc, vi, rpm, r, θ, cl, cd, chord)
-end
-
 @time for i ∈ eachindex(r)
     args = (vc, rpm, r[i], θ, cl, cd, chord)
     vi[i] = secant_solver(
-        blade_vi, 0.0, guess_range=(0.0, v_tip/2), args=args)
+        trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args)
 end
 
 
@@ -52,7 +49,7 @@ thrust = integrate(dT, r)/delta
 
 plot(r, dT)
 plot!(r, dTm)
-plot(r, vi)
+plot!(r, vi)
 
 scatter!([J], [thrust], label="J = $J")
 

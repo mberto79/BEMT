@@ -1,7 +1,7 @@
 export load_aerofoil, sigma, thrust_coefficient, integrate
 export linear_twist
 export induced_angle, corrected_velocity
-export thrust_element, thrust_momentum, element_momentum_balance
+export thrust_element, thrust_momentum, trust_balance
 
 
 load_aerofoil(file; startline=0) = begin
@@ -60,7 +60,7 @@ thrust_momentum(vc, vi, r, ρ) = begin
     4*π*ρ*(vc + vi)*vi*r # (rdr)
 end
 
-element_momentum_balance(vc, vi, rpm, r, θ, cl, cd, chord) = begin
+trust_balance(vi, vc, rpm, r, θ, cl, cd, chord) = begin
     Ω = (2π/60)*rpm
     U_r = Ω*r
     ϕ = atan((vc + vi)/U_r) 
