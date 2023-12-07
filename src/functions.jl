@@ -1,8 +1,7 @@
 export BGeometry, uniform_mesh
-export load_aerofoil, sigma, thrust_coefficient, integrate
+export load_aerofoil, sigma, integrate
 export linear_twist
 export calculate_vi
-export induced_angle, corrected_velocity
 export thrust_element, thrust_momentum, trust_balance
 
 struct BGeometry{I<:Integer,F<:AbstractFloat,V<:AbstractArray} 
@@ -44,35 +43,6 @@ end
 
 sigma(chord, radius, nb) = begin
     nb*chord/(π*radius)
-end
-
-# Induced angle
-phi(r, vi, vc, rpm) = atan((vc + vi)/((2π/60)*rpm*r))
-
-# True velocity 
-U_inf(r, vi, vc, rpm) = sqrt( (vc + vi)^2 + ((2π/60)*rpm*r)^2 )
-
-# Lift and drag forces 
-aerofoil_forces(ρ, U_inf, cl, cd, c, dr) = begin
-    lift = 0.5*ρ*U_inf^2*c*cl*dr
-    drag = 0.5*ρ*U_inf^2*c*cd*dr
-    lift, drag
-end
-
-thrust_coefficient(σ, a, θ, r, λ) = begin
-    (σ/2)*a*(θ*r^2 - λ*r)
-end
-
-get_thrust(cl, cd, σ, ϕ, r) = begin
-    (σ/2)*(cl*cos(ϕ) - cd*sin(ϕ))*r^2
-end
-
-induced_angle(vc, vi, rpm, r) = begin
-    atan((vc + vi)/((2π/60)*rpm*r))
-end
-
-corrected_velocity(vc, vi, rpm, r) = begin
-    sqrt( (vc + vi)^2 + ((2π/60)*rpm*r)^2 )
 end
 
 thrust_element(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord) = begin
