@@ -8,8 +8,7 @@ struct BGeometry{I<:Integer,F<:AbstractFloat,V<:AbstractArray}
     n_blades::I
     n_panels::I
     n_edges::I
-    r_panels::V
-    r_edges::V
+    r::V
     radius::F
     dr::F
 end
@@ -17,14 +16,12 @@ end
 uniform_mesh(radius, n_blades, n_panels) = begin
     n_edges = n_panels+1
     dr = radius/n_panels
-    r_edges = [0.0:dr:radius;]
-    r_panels = [(dr/2):dr:(radius- dr/2);]
+    r = [0.0:dr:radius;]
     return BGeometry(
         n_blades,
         n_panels,
         n_edges,
-        r_panels,
-        r_edges,
+        r,
         radius,
         dr
     )    
@@ -83,7 +80,7 @@ thrust_element(cl, cd, c, U_corr, phi, ρ,nb) = begin
 end
 
 thrust_momentum(geometry, vi, vc, ρ) = begin
-    r = geometry.r_edges
+    r = geometry.r
     dT = zeros(eltype(r), geometry.n_edges)
     for i ∈ eachindex(r)
         dT[i] = 4*π*ρ*(vc + vi[i])*vi[i]*r[i]
