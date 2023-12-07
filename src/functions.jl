@@ -1,27 +1,31 @@
-export BGeometry, discretise_blade
+export BGeometry, uniform_mesh
 export load_aerofoil, sigma, thrust_coefficient, integrate
 export linear_twist
 export induced_angle, corrected_velocity
 export thrust_element, thrust_momentum, trust_balance
 
 struct BGeometry{I<:Integer,F<:AbstractFloat,V<:AbstractArray} 
+    n_blades::I
     n_panels::I
     n_edges::I
     r_panels::V
     r_edges::V
+    radius::F
     dr::F
 end
 
-discretise_blade(radius, n_panels) = begin
+uniform_mesh(radius, n_blades, n_panels) = begin
     n_edges = n_panels+1
     dr = radius/n_panels
     r_edges = [0.0:dr:radius;]
     r_panels = [(dr/2):dr:(radius- dr/2);]
     return BGeometry(
+        n_blades,
         n_panels,
         n_edges,
         r_panels,
         r_edges,
+        radius,
         dr
     )    
 end

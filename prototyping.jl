@@ -25,21 +25,21 @@ vc = J*n*diameter
 
 n = 75
 
-geometry = discretise_blade(radius, n)
+rotor = uniform_mesh(radius, nb, n)
 θ = linear_twist(20, 7.5, radius)
 chord(r) = 0.15*radius
 
-vi = similar(geometry.r_edges)
-@time for i ∈ eachindex(geometry.r_edges)
-    args = (vc, rpm, nb, geometry.r_edges[i], θ, cl, cd, chord)
+vi = similar(rotor.r_edges)
+@time for i ∈ eachindex(rotor.r_edges)
+    args = (vc, rpm, nb, rotor.r_edges[i], θ, cl, cd, chord)
     vi[i] = secant_solver(
         trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args)
 end
 
 
-dTm = thrust_momentum(geometry, vi, vc, ρ)
+dTm = thrust_momentum(rotor, vi, vc, ρ)
 sum(dTm)
-thrust = integrate(dTm, geometry.r_edges)
+thrust = integrate(dTm, rotor.r_edges)
 
-plot(geometry.r_edges, dTm)
-plot!(geometry.r_edges, vi)
+plot(rotor.r_edges, dTm)
+plot!(rotor.r_edges, vi)
