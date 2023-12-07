@@ -1,6 +1,7 @@
 export BGeometry, uniform_mesh
 export load_aerofoil, sigma, thrust_coefficient, integrate
 export linear_twist
+export calculate_vi
 export induced_angle, corrected_velocity
 export thrust_element, thrust_momentum, trust_balance
 
@@ -74,22 +75,33 @@ corrected_velocity(vc, vi, rpm, r) = begin
     sqrt( (vc + vi)^2 + ((2π/60)*rpm*r)^2 )
 end
 
-thrust_element(cl, cd, c, U_corr, phi, ρ,nb) = begin
-    qA = 0.5*ρ*U_corr^2*c # (c*dr)
-    ( cl*cos(phi) - cd*sin(phi) )*qA*nb
+thrust_element(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord) = begin
+    (; r, n_blades, n_edges) = rotor
+    dT = zeros(eltype(r), n_edges)
+    Ω = (2π/60)*rpm
+    for i ∈ eachindex(r)
+        ri = r[i]
+        vii = vi[i]
+        U_r = Ω*ri
+        ϕ = atan((vc + vii)/U_r) 
+        U_corr = sqrt( (vc + vii)^2 + (U_r)^2 )
+        α = θ(ri) - ϕ
+        qA = 0.5*ρ*U_corr^2*chord(ri) # (dr) missing
+        dT[i] =( cl(α)*cos(ϕ) - cd(α)*sin(ϕ) )*qA*n_blades
+    end
+    return dT
 end
 
-thrust_momentum(geometry, vi, vc, ρ) = begin
-    r = geometry.r
-    dT = zeros(eltype(r), geometry.n_edges)
+thrust_momentum(rotor, vi, vc, ρ) = begin
+    r = rotor.r
+    dT = zeros(eltype(r), rotor.n_edges)
     for i ∈ eachindex(r)
         dT[i] = 4*π*ρ*(vc + vi[i])*vi[i]*r[i]
     end
     return dT
 end
 
-trust_balance(vi, vc, rpm, nb, r, θ, cl, cd, chord) = begin
-    Ω = (2π/60)*rpm
+trust_balance(vi, vc, Ω, nb, r, θ, chord, cl, cd) = begin
     U_r = Ω*r
     ϕ = atan((vc + vi)/U_r) 
     U_corr = sqrt( (vc + vi)^2 + (U_r)^2 )
@@ -98,6 +110,19 @@ trust_balance(vi, vc, rpm, nb, r, θ, cl, cd, chord) = begin
     Te =( cl(α)*cos(ϕ) - cd(α)*sin(ϕ) )*qA*nb
     Tm = 4*π*(vc + vi)*vi*r # (ρ*dr) missing
     Te - Tm
+end
+
+calculate_vi(rotor, vc, rpm, θ, chord, cl, cd) = begin
+    (; r, radius, n_blades) = rotor
+    Ω = (2π/60)*rpm
+    v_tip = Ω*radius
+    vi = similar(r)
+    for i ∈ eachindex(r)
+        args = (vc, Ω, n_blades, r[i], θ, chord, cl, cd)
+        vi[i] = secant_solver(
+            trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args)
+    end
+    return vi
 end
 
 integrate(fx, x) = begin
