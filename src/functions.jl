@@ -60,13 +60,13 @@ thrust_momentum(vc, vi, r, ρ) = begin
     4*π*ρ*(vc + vi)*vi*r # (rdr)
 end
 
-trust_balance(vi, vc, rpm, r, θ, cl, cd, chord, nb) = begin
+trust_balance(vi, vc, rpm, nb, r, θ, cl, cd, chord) = begin
     Ω = (2π/60)*rpm
     U_r = Ω*r
     ϕ = atan((vc + vi)/U_r) 
     U_corr = sqrt( (vc + vi)^2 + (U_r)^2 )
     α = θ(r) - ϕ
-    qA = 0.5*U_corr^2*chord # (ρ*dr) missing
+    qA = 0.5*U_corr^2*chord(r) # (ρ*dr) missing
     Te =( cl(α)*cos(ϕ) - cd(α)*sin(ϕ) )*qA*nb
     Tm = 4*π*(vc + vi)*vi*r # (ρ*dr) missing
     Te - Tm
