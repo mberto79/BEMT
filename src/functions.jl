@@ -1,8 +1,30 @@
+export BGeometry, discretise_blade
 export load_aerofoil, sigma, thrust_coefficient, integrate
 export linear_twist
 export induced_angle, corrected_velocity
 export thrust_element, thrust_momentum, trust_balance
 
+struct BGeometry{I<:Integer,F<:AbstractFloat,V<:AbstractArray} 
+    n_panels::I
+    n_edges::I
+    r_panels::V
+    r_edges::V
+    dr::F
+end
+
+discretise_blade(radius, n_panels) = begin
+    n_edges = n_panels+1
+    dr = radius/n_panels
+    r_edges = [0.0:dr:radius;]
+    r_panels = [(dr/2):dr:(radius- dr/2);]
+    return BGeometry(
+        n_panels,
+        n_edges,
+        r_panels,
+        r_edges,
+        dr
+    )    
+end
 
 load_aerofoil(file; startline=0) = begin
     data = readdlm(file, ',', Float64, skipstart=startline-1)
@@ -56,8 +78,13 @@ thrust_element(cl, cd, c, U_corr, phi, ρ,nb) = begin
     ( cl*cos(phi) - cd*sin(phi) )*qA*nb
 end
 
-thrust_momentum(vc, vi, r, ρ) = begin
-    4*π*ρ*(vc + vi)*vi*r # (rdr)
+thrust_momentum(geometry, vi, vc, ρ) = begin
+    r = geometry.r_edges
+    dT = zeros(eltype(r), geometry.n_edges)
+    for i ∈ eachindex(r)
+        dT[i] = 4*π*ρ*(vc + vi[i])*vi[i]*r[i]
+    end
+    return dT
 end
 
 trust_balance(vi, vc, rpm, nb, r, θ, cl, cd, chord) = begin
