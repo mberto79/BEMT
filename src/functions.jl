@@ -2,7 +2,7 @@ export BGeometry, uniform_mesh
 export load_aerofoil, sigma, integrate
 export linear_twist
 export calculate_vi
-export thrust_element, thrust_momentum, trust_balance
+export element_performance, thrust_momentum, trust_balance
 
 struct BGeometry{I<:Integer,F<:AbstractFloat,V<:AbstractArray} 
     n_blades::I
@@ -45,9 +45,11 @@ sigma(chord, radius, nb) = begin
     nb*chord/(π*radius)
 end
 
-thrust_element(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord) = begin
+element_performance(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord) = begin
     (; r, n_blades, n_edges) = rotor
     dT = zeros(eltype(r), n_edges)
+    dQ = zeros(eltype(r), n_edges)
+    dP = zeros(eltype(r), n_edges)
     Ω = (2π/60)*rpm
     for i ∈ eachindex(r)
         ri = r[i]
@@ -56,10 +58,14 @@ thrust_element(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord) = begin
         ϕ = atan((vc + vii)/U_r) 
         U_corr = sqrt( (vc + vii)^2 + (U_r)^2 )
         α = θ(ri) - ϕ
-        qA = 0.5*ρ*U_corr^2*chord(ri) # (dr) missing
-        dT[i] =( cl(α)*cos(ϕ) - cd(α)*sin(ϕ) )*qA*n_blades
+        qN = 0.5*ρ*U_corr^2*chord(ri)*n_blades # (dr) missing
+        sinϕ = sin(ϕ); cosϕ = cos(ϕ)
+        clα = cl(α); cdα = cd(α)
+        dT[i] = ( clα*cosϕ - cdα*sinϕ )*qN
+        dQ[i] = ( clα*sinϕ + cdα*cosϕ )*qN*ri
+        dP[i] = ( clα*sinϕ + cdα*cosϕ )*qN*ri*Ω
     end
-    return dT
+    return dT, dQ, dP
 end
 
 thrust_momentum(rotor, vi, vc, ρ) = begin

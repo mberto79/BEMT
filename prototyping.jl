@@ -12,7 +12,7 @@ diameter = 25.40e-2
 radius = diameter/2
 ρ = 1.225
 nb = 2
-rpm = 2200
+rpm = 2500
 omega = rpm*(2π/60)
 v_tip = omega*radius
 
@@ -29,18 +29,21 @@ chord(r) = 0.15*radius
 
 vi = calculate_vi(rotor, vc, rpm, θ, chord, cl, cd)
 
-dTe = thrust_element(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord)
+dT, dQ, dP = element_performance(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord)
 dTm = thrust_momentum(rotor, vi, vc, ρ)
 thrust = integrate(dTm, rotor.r)
-thrust = integrate(dTe, rotor.r)
+thrust = integrate(dT, rotor.r)
+torque = integrate(dQ, rotor.r)
+power = integrate(dP, rotor.r)
 
 scatter!(
-    [rpm], [thrust], 
+    [rpm], [torque], 
     label="RPM = $rpm",
-    xlabel="RPM", ylabel="Thrust [N]"
+    xlabel="RPM", ylabel="Torque [N]"
     )
 
-plot(rotor.r, dTm)
-plot!(rotor.r, dTe)
+plot(rotor.r, dT)
+plot(rotor.r, dQ)
+plot!(rotor.r, dP)
 plot!(rotor.r, vi)
 
