@@ -1,4 +1,4 @@
-# To be completed!
+# Work in progress
 
 J = V/(nD) # n in rev/sec
 n = rpm*(1/60)
