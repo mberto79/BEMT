@@ -1,6 +1,6 @@
 export BGeometry, uniform_mesh
 export load_xfoil, load_xflr5, sigma, integrate
-export linear_twist
+export linear_function, constant_function
 export calculate_vi
 export element_performance, thrust_momentum, trust_balance
 
@@ -63,10 +63,12 @@ fit_polar(data) = begin
     cl, cd
 end
 
-linear_twist(a_root, a_tip, radius) = begin
-    k1 = deg2rad(a_root)
-    k2 = deg2rad(a_tip)
-    (r) -> k1 + (k2 - k1)/radius*r
+linear_function(val_root, val_tip, radius) = begin
+    (r) -> val_root + (val_tip - val_root)/radius*r
+end
+
+constant_function(k) = begin
+    (r) -> k
 end
 
 sigma(chord, radius, nb) = begin
