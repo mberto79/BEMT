@@ -1,8 +1,9 @@
 name = "BEMT"
 uuid = "97f47182-a072-4c73-a57d-47aa3f99a11f"
 authors = ["Humberto Medina <h.medina@aerofluids.org>"]
-version = "0.2.0"
+version = "0.1.0"
 
 [deps]
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 Dierckx = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
+Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
