@@ -1,5 +1,5 @@
 export BGeometry, uniform_mesh
-export load_aerofoil, sigma, integrate
+export load_xfoil, load_xflr5, sigma, integrate
 export linear_twist
 export calculate_vi
 export element_performance, thrust_momentum, trust_balance
@@ -27,8 +27,36 @@ uniform_mesh(radius, n_blades, n_panels) = begin
     )    
 end
 
-load_aerofoil(file; startline=0) = begin
+load_xfoil(file; startline=12) = begin
     data = readdlm(file, ',', Float64, skipstart=startline-1)
+    cl, cd = fit_polar(data)
+    return cl, cd
+end
+
+load_xflr5(file; startline=12) = begin
+    lines = readlines(file)
+    nlines = length(lines)
+    data_lines = nlines-startline-1
+    out = zeros(data_lines, 3)
+    line_count = 0
+    for i ∈ startline:nlines
+        line = lines[i]
+        sline = split(line)
+        line_count += 1
+        data_count = 0 
+        for item ∈ sline 
+            data = tryparse(Float64, item)
+            if data !== nothing && data_count <=2
+                data_count +=1
+                out[line_count, data_count] = data
+            end
+        end
+    end
+    cl, cd = fit_polar(out)
+    return cl, cd
+end
+
+fit_polar(data) = begin 
     alpha = deg2rad.(data[:,1])
     cl = Spline1D(alpha, data[:,2]) # generate cl fit
     cd = Spline1D(alpha, data[:,3]) # generate cd fit
