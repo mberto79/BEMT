@@ -57,6 +57,14 @@ The `BEMT.jl` package is not meant to be a production package, thus, it has not 
 add https://github.com/mberto79/BEMT.git
 ```
 
+### Update `BEMT.jl`
+
+As it is common with software. It is likely that this package will be updated from time to time, for bug fixes or to add new functionality. To update your installation to a new version, first enter *package mode* by pressing "]" in the Julia REPL and then type:
+
+```julia
+update BEMT
+```
+
 ## Basic usage example
 
 Below is an example of the basic functionality provided in `BEMT.jl` which can be readily extended to perform more complex and analyses. 
@@ -66,7 +74,6 @@ using Plots
 using BEMT
 
 # Define base directory where example datafiles are stored
-
 examples_dir = pkgdir(BEMT, "examples")
 data_dir = joinpath(examples_dir, "data")
 
