@@ -76,7 +76,7 @@ sigma(chord, radius, nb) = begin
 end
 
 element_performance(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord) = begin
-    (; r, n_blades, n_edges) = rotor
+    r, n_blades, n_edges = rotor.r, rotor.n_blades, rotor.n_edges
     dT = zeros(eltype(r), n_edges)
     dQ = zeros(eltype(r), n_edges)
     dP = zeros(eltype(r), n_edges)
@@ -118,8 +118,8 @@ trust_balance(vi, vc, Ω, nb, r, θ, chord, cl, cd) = begin
     Te - Tm
 end
 
-calculate_vi(rotor, vc, rpm, θ, chord, cl, cd) = begin
-    (; r, radius, n_blades) = rotor
+calculate_vi(radius, rotor, vc, rpm, θ, chord, cl, cd) = begin
+    r, n_blades, n_edges = rotor.r, rotor.n_blades, rotor.n_edges
     Ω = (2π/60)*rpm
     v_tip = Ω*radius
     vi = similar(r)

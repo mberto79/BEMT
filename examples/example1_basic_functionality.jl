@@ -2,16 +2,14 @@ using Plots
 using BEMT
 
 # Define base directory where example datafiles are stored
-
-examples_dir = pkgdir(BEMT, "examples")
-data_dir = joinpath(examples_dir, "data")
+data_dir = "D:\\Document\\BEMT-main\\examples\\data\\example1"
 
 # Define path for xfoil data file and loading
-file_xfoil = joinpath(data_dir, "example1", "NACA001264_xfoil.csv")
+file_xfoil = joinpath(data_dir, "NACA001264_xfoil.csv")
 cl, cd = load_xfoil(file_xfoil) # note cl and cd are functions
 
 # Define path for fxlr5 data file and loading
-file_xflr = joinpath(data_dir, "example1", "NACA0012_xflr5.txt")
+file_xflr = joinpath(data_dir, "NACA0012_xflr5.txt")
 cl, cd = load_xflr5(file_xflr) # note cl and cd are functions
 
 # Define angle of attack range in degrees 
