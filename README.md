@@ -67,7 +67,16 @@ update BEMT
 
 ## Basic usage example
 
-Below is an example of the basic functionality provided in `BEMT.jl` which can be readily extended to perform more complex and analyses. 
+Below is an example of the basic functionality provided in `BEMT.jl` which can be readily extended to perform more complex and analyses. To run the example follow these steps:
+- Create an empty directory in your local machine
+- Open vscode and open the directory you created (above)
+- Create a new file (making sure to add the ".jl" file extension)
+- Copy and paste the example below into the file (above)
+- Execute the code. You can do this line by line pressing shift and enter (on Windows and Linux)
+
+Note the following:
+- Ensure you have installed the BEMT.jl package (see installation instruction above)
+- Ensure that both Julia and the Julia extension for vscode are installed.
 
 ```Julia
 using Plots
