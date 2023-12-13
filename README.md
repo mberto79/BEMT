@@ -67,12 +67,12 @@ update BEMT
 
 ## Basic usage example
 
-Below is an example of the basic functionality provided in `BEMT.jl` which can be readily extended to perform more complex and analyses. To run the example follow these steps:
+Below is an example of the basic functionality provided in `BEMT.jl` which can be readily extended to perform more complex analyses. To run the example follow these steps:
 - Create an empty directory in your local machine
-- Open vscode and open the directory you created (above)
+- Open vscode and open the directory you created
 - Create a new file (making sure to add the ".jl" file extension)
-- Copy and paste the example below into the file (above)
-- Execute the code. You can do this line by line pressing shift and enter (on Windows and Linux)
+- Copy and paste the example below into the file
+- Execute the code. You can do this line by line by pressing the shift and enter keys (on Windows and Linux)
 
 Note the following:
 - Ensure you have installed the BEMT.jl package (see installation instruction above)
@@ -127,8 +127,9 @@ n = 75
 rotor = uniform_mesh(radius, nb, n)
 
 # Define geometry (these are functions)
-theta = linear_function(deg2rad(20), deg2rad(7.5), radius) # pitch angle
-chord = constant_function(0.075) 
+theta = linear_function(deg2rad(20), deg2rad(7.5), radius) # 20 to 7.5 degree twist
+chord = constant_function(0.075) # constant chord of 0.075
+# chord = linear_function(0.05, 0.02) # linear taper from 0.05 to 0.02 m
 
 # Solve BEMT equations to determine induced velocity
 vi = calculate_vi(rotor, vc, rpm, theta, chord, cl, cd)
