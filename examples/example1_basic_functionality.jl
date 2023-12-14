@@ -2,7 +2,6 @@ using Plots
 using BEMT
 
 # Define base directory where example datafiles are stored
-
 examples_dir = pkgdir(BEMT, "examples")
 data_dir = joinpath(examples_dir, "data")
 
@@ -47,8 +46,9 @@ n = 75
 rotor = uniform_mesh(radius, nb, n)
 
 # Define geometry (these are functions)
-theta = linear_function(deg2rad(20), deg2rad(7.5), radius) # pitch angle
-chord = constant_function(0.075) 
+theta = linear_function(deg2rad(20), deg2rad(7.5), radius) # 20 to 7.5 degree twist
+chord = constant_function(0.075) # constant chord of 0.075
+# chord = linear_function(0.05, 0.02) # linear taper from 0.05 to 0.02 m
 
 # Solve BEMT equations to determine induced velocity
 vi = calculate_vi(rotor, vc, rpm, theta, chord, cl, cd)
@@ -58,15 +58,15 @@ dT, dQ, dP = element_performance(rotor, vi, vc, rpm, rho, cl, cd, theta, chord)
 dTm = thrust_momentum(rotor, vi, vc, rho) # used here as a check
 
 # Integrate element results over the rotor blades
-T = integrate(dT, rotor.r)
+T = integrate(dT, rotor.r) # Rotor thrust prediction (by BEM)
 Tm = integrate(dTm, rotor.r) # should be similar to the value of T
-Q = integrate(dQ, rotor.r)
-P = integrate(dP, rotor.r)
+Q = integrate(dQ, rotor.r) # Rotor torque prediction
+P = integrate(dP, rotor.r) # Rotor power prediction
 
 # Plot results
-p4 = plot(rotor.r, vi, label=:false, xlabel="alpha", ylabel="Induced velocity")
-p1 = plot(rotor.r, dT, label=:false, xlabel="alpha", ylabel="Thrust / span")
-p2 = plot(rotor.r, dQ, label=:false, xlabel="alpha", ylabel="Torque / span")
-p3 = plot(rotor.r, dP, label=:false, xlabel="alpha", ylabel="Power / span")
+p4 = plot(rotor.r, vi, label=:false, xlabel="Radius [m]", ylabel="Induced velocity")
+p1 = plot(rotor.r, dT, label=:false, xlabel="Radius [m]", ylabel="Thrust / span")
+p2 = plot(rotor.r, dQ, label=:false, xlabel="Radius [m]", ylabel="Torque / span")
+p3 = plot(rotor.r, dP, label=:false, xlabel="Radius [m]", ylabel="Power / span")
 
 plot(p1,p2,p3,p4, plot_title="Rotor Performance")

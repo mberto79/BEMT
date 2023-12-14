@@ -145,10 +145,10 @@ Q = integrate(dQ, rotor.r) # Rotor torque prediction
 P = integrate(dP, rotor.r) # Rotor power prediction
 
 # Plot results
-p4 = plot(rotor.r, vi, label=:false, xlabel="alpha", ylabel="Induced velocity")
-p1 = plot(rotor.r, dT, label=:false, xlabel="alpha", ylabel="Thrust / span")
-p2 = plot(rotor.r, dQ, label=:false, xlabel="alpha", ylabel="Torque / span")
-p3 = plot(rotor.r, dP, label=:false, xlabel="alpha", ylabel="Power / span")
+p4 = plot(rotor.r, vi, label=:false, xlabel="Radius [m]", ylabel="Induced velocity")
+p1 = plot(rotor.r, dT, label=:false, xlabel="Radius [m]", ylabel="Thrust / span")
+p2 = plot(rotor.r, dQ, label=:false, xlabel="Radius [m]", ylabel="Torque / span")
+p3 = plot(rotor.r, dP, label=:false, xlabel="Radius [m]", ylabel="Power / span")
 
 plot(p1,p2,p3,p4, plot_title="Rotor Performance")
 ```
