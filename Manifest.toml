@@ -4,6 +4,9 @@ julia_version = "1.9.3"
 manifest_format = "2.0"
 project_hash = "74fb729b8fe4ddd36f15e7673dc704ad787a5f57"
 
+[compat]
+julia = "^1.9"
+
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 version = "1.1.1"
