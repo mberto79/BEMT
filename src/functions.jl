@@ -1,4 +1,4 @@
-export BGeometry, uniform_mesh
+export BGeometry, radius, elements, points, uniform_mesh
 export load_xfoil, load_xflr5, sigma, integrate
 export linear_function, constant_function
 export calculate_vi
@@ -12,6 +12,11 @@ struct BGeometry{I<:Integer,F<:AbstractFloat,V<:AbstractArray}
     radius::F
     dr::F
 end
+
+# BGeometry access functions
+radius(rotor::BGeometry) = rotor.r
+elements(rotor::BGeometry) = rotor.n_panels
+points(rotor::BGeometry) = rotor.n_edges
 
 uniform_mesh(radius, n_blades, n_panels) = begin
     n_edges = n_panels+1
@@ -118,17 +123,21 @@ trust_balance(vi, vc, Ω, nb, r, θ, chord, cl, cd) = begin
     Te - Tm
 end
 
-calculate_vi(rotor, vc, rpm, θ, chord, cl, cd) = begin
+calculate_vi(rotor, vc, rpm, θ, chord, cl, cd; show=false) = begin
     (; r, radius, n_blades) = rotor
     Ω = (2π/60)*rpm
     v_tip = Ω*radius
-    vi = similar(r)
+    vi = similar(r); converged = false
     for i ∈ eachindex(r)
         args = (vc, Ω, n_blades, r[i], θ, chord, cl, cd)
-        vi[i] = secant_solver(
-            trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args)
+        vi[i], converged = secant_solver(
+            trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args, show=show)
+        if !converged
+            vi[i] = 0.0
+            break
+        end
     end
-    return vi
+    return vi, converged
 end
 
 integrate(fx, x) = begin
