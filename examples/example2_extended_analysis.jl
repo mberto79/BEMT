@@ -30,44 +30,71 @@ plot!(xlabel="alpha", ylabel="Aerodynamic coefficients")
 
 
 # Define propeller 
-diameter = 25.40e-2
+diameter = 15e-2
 radius = diameter/2
-nb = 2 # number of blades
+nb = 3 # number of blades
+
+# Define mesh for BET
+n = 100
+rotor = uniform_mesh(radius, nb, n)
+
+# Define geometry (these are functions)
+theta = linear_function(deg2rad(20), deg2rad(15), radius) # 20 to 7.5 degree twist
+chord = constant_function(0.035) # constant chord of 0.075
+# chord = linear_function(0.05, 0.02) # linear taper from 0.05 to 0.02 m
 
 # Operating conditions
 vc = 0
 rho = 1.225
-rpm = 500
-omega = rpm*(2π/60)
-v_tip = omega*radius
+# rmp = 500 # Original setting for a single RPM run
+rpm_range = 100:100:5000 # We want to loop over the RPM variable
 
-# Define mesh for BET
-n = 75
-rotor = uniform_mesh(radius, nb, n)
+# Pre-allocate output (single values are now vectors)
 
-# Define geometry (these are functions)
-theta = linear_function(deg2rad(20), deg2rad(7.5), radius) # 20 to 7.5 degree twist
-chord = constant_function(0.075) # constant chord of 0.075
-# chord = linear_function(0.05, 0.02) # linear taper from 0.05 to 0.02 m
+T = zeros(length(rpm_range))
+Q = zeros(length(rpm_range))
+P = zeros(length(rpm_range))
+last_iter = length(rpm_range)
 
-# Solve BEMT equations to determine induced velocity
-vi = calculate_vi(rotor, vc, rpm, theta, chord, cl, cd)
+for (i, rpm) in enumerate(rpm_range)
+    println("Evaluating rpm: ", rpm)
 
-# Calculate aerodynamic performance
-dT, dQ, dP = element_performance(rotor, vi, vc, rpm, rho, cl, cd, theta, chord)
-dTm = thrust_momentum(rotor, vi, vc, rho) # used here as a check
+    omega = rpm*(2π/60)
+    v_tip = omega*radius
 
-# Integrate element results over the rotor blades
-T = integrate(dT, rotor.r) # Rotor thrust prediction (by BEM)
-Tm = integrate(dTm, rotor.r) # should be similar to the value of T
-Q = integrate(dQ, rotor.r) # Rotor torque prediction
-P = integrate(dP, rotor.r) # Rotor power prediction
+    # Solve BEMT equations to determine induced velocity
+    vi, converged = calculate_vi(rotor, vc, rpm, theta, chord, cl, cd, warnings=false)
+    
+    if !converged
+        last_iter = i-1
+        println("Last converged iteration ", last_iter)
+        break 
+    end
+
+    # Calculate aerodynamic performance
+    dT, dQ, dP = element_performance(rotor, vi, vc, rpm, rho, cl, cd, theta, chord)
+
+    # Integrate element results over the rotor blades
+    T[i] = integrate(dT, rotor.r) # Rotor thrust prediction (by BEM)
+    Q[i] = integrate(dQ, rotor.r) # Rotor torque prediction
+    # P[i] = integrate(dP, rotor.r) # Rotor power prediction
+
+end
 
 # Plot results
-p4 = plot(rotor.r, vi, label=:false, xlabel="Radius [m]", ylabel="Induced velocity")
-p1 = plot(rotor.r, dT, label=:false, xlabel="Radius [m]", ylabel="Thrust / span")
-p2 = plot(rotor.r, dQ, label=:false, xlabel="Radius [m]", ylabel="Torque / span")
-p3 = plot(rotor.r, dP, label=:false, xlabel="Radius [m]", ylabel="Power / span")
+p1 = plot(
+    rpm_range[1:last_iter], T[1:last_iter], 
+    label="Thrust", xlabel="RPM", ylabel="T [N]"
+    )
+p2 = plot(
+    rpm_range[1:last_iter], Q[1:last_iter], 
+    label="Torque", xlabel="RPM", ylabel="Q [Nm]"
+    )
+# p3 = plot(
+#     rpm_range[1:last_iter], P[1:last_iter], 
+#     label="Power", xlabel="RPM", ylabel="Q [W]"
+#     )
 
-plot(p1,p2,p3,p4, plot_title="Rotor Performance")
-savefig(joinpath(examples_dir,"example1_results.svg"))
+plot(p1,p2) 
+
+# savefig(joinpath(examples_dir,"example2_results.svg"))

@@ -14,7 +14,8 @@ Find the value x for which a function `func` will return the target value `funcV
 """
 function secant_solver(
     func, funcValue; 
-    guess_range::Tuple{T,T}=(), args=(), tol::T=1e-8, trials::I=10,show=false
+    guess_range::Tuple{T,T}=(), args=(), tol::T=1e-8, trials::I=10,
+    show_convergence=false, warnings=true
     ) where {T<:Number,I<:Integer}
     
     f(x) = func(x, args...,) # redefine input function to include arguments
@@ -33,20 +34,22 @@ function secant_solver(
     f1 = f(g1) - funcValue
     f2 = f(g2) - funcValue
     
-    for i ∈ 1:20
+    for i ∈ 1:200
     g2, g1, f1 = secant_method(g1, g2, f1, f2)
     f2 = f(g2) - funcValue
         if abs(f2) <= tol
-            show ? println("Converged: ", i, " iterations.") : nothing
+            show_convergence ? println("Converged: ", i, " iterations.") : nothing
             return g2, true
         end
     end
 
-    print("\nWarning: Convergence criterion not met!\n")
-    print("Check 1: Input configuration is not physical (reduce/increase RPM or θ)\n")
-    print("Check 2: Angle operating beyond range used for cl and cd (lower θ or Vc)\n")
-    print("Check 3: Mesh does not have sufficient points\n")
-    print("Check 4: Solver tolerance too high\n\n")
+    if warnings
+        print("\nWarning: Convergence criterion not met!\n")
+        print("Check 1: Input configuration is not physical (reduce/increase RPM or θ)\n")
+        print("Check 2: Angle operating beyond range used for cl and cd (lower θ or Vc)\n")
+        print("Check 3: Mesh does not have sufficient points\n")
+        print("Check 4: Solver tolerance too high\n\n")
+    end
 
     return 0.0, false
 end

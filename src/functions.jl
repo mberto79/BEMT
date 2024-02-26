@@ -20,7 +20,7 @@ points(rotor::BGeometry) = rotor.n_edges
 
 uniform_mesh(radius, n_blades, n_panels) = begin
     n_edges = n_panels+1
-    dr = radius/n_panels
+    dr = radius/(n_panels-1)
     r = [0.0:dr:radius;]
     return BGeometry(
         n_blades,
@@ -81,10 +81,10 @@ sigma(chord, radius, nb) = begin
 end
 
 element_performance(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord) = begin
-    (; r, n_blades, n_edges) = rotor
-    dT = zeros(eltype(r), n_edges)
-    dQ = zeros(eltype(r), n_edges)
-    dP = zeros(eltype(r), n_edges)
+    (; r, n_blades, n_panels, n_edges) = rotor
+    dT = similar(r)
+    dQ = similar(r)
+    dP = similar(r)
     Ω = (2π/60)*rpm
     for i ∈ eachindex(r)
         ri = r[i]
@@ -123,7 +123,9 @@ trust_balance(vi, vc, Ω, nb, r, θ, chord, cl, cd) = begin
     Te - Tm
 end
 
-calculate_vi(rotor, vc, rpm, θ, chord, cl, cd; show=false) = begin
+calculate_vi(
+    rotor, vc, rpm, θ, chord, cl, cd; show_convergence=false, warnings=true
+    ) = begin
     (; r, radius, n_blades) = rotor
     Ω = (2π/60)*rpm
     v_tip = Ω*radius
@@ -131,7 +133,8 @@ calculate_vi(rotor, vc, rpm, θ, chord, cl, cd; show=false) = begin
     for i ∈ eachindex(r)
         args = (vc, Ω, n_blades, r[i], θ, chord, cl, cd)
         vi[i], converged = secant_solver(
-            trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args, show=show)
+            trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args, show_convergence=show_convergence, warnings=warnings
+            )
         if !converged
             vi[i] = 0.0
             break
