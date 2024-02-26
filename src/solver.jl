@@ -38,14 +38,17 @@ function secant_solver(
     f2 = f(g2) - funcValue
         if abs(f2) <= tol
             show ? println("Converged: ", i, " iterations.") : nothing
-            return g2
+            return g2, true
         end
     end
-    print("Warning: Convergence criterion not met!\n")
+
+    print("\nWarning: Convergence criterion not met!\n")
     print("Check 1: Input configuration is not physical (reduce/increase RPM or θ)\n")
     print("Check 2: Angle operating beyond range used for cl and cd (lower θ or Vc)\n")
     print("Check 3: Mesh does not have sufficient points\n")
-    print("Check 4: Solver tolerance too high\n")
+    print("Check 4: Solver tolerance too high\n\n")
+
+    return 0.0, false
 end
 
 
