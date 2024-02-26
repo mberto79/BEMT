@@ -132,7 +132,7 @@ chord = constant_function(0.075) # constant chord of 0.075
 # chord = linear_function(0.05, 0.02) # linear taper from 0.05 to 0.02 m
 
 # Solve BEMT equations to determine induced velocity
-vi = calculate_vi(rotor, vc, rpm, theta, chord, cl, cd)
+vi, converged = calculate_vi(rotor, vc, rpm, theta, chord, cl, cd)
 
 # Calculate aerodynamic performance
 dT, dQ, dP = element_performance(rotor, vi, vc, rpm, rho, cl, cd, theta, chord)
