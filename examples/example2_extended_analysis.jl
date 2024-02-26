@@ -98,4 +98,4 @@ p2 = plot(
 
 plot(p1,p2) 
 
-# savefig(joinpath(examples_dir,"example2_results.svg"))
+savefig(joinpath(examples_dir,"example2_results.svg"))
