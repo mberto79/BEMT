@@ -152,3 +152,4 @@ p3 = plot(rotor.r, dP, label=:false, xlabel="Radius [m]", ylabel="Power / span")
 
 plot(p1,p2,p3,p4, plot_title="Rotor Performance")
 ```
+![Example 1 - Element performance](examples/example1_results.png)
