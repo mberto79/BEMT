@@ -70,4 +70,4 @@ p2 = plot(rotor.r, dQ, label=:false, xlabel="Radius [m]", ylabel="Torque / span"
 p3 = plot(rotor.r, dP, label=:false, xlabel="Radius [m]", ylabel="Power / span")
 
 plot(p1,p2,p3,p4, plot_title="Rotor Performance")
-savefig(joinpath(examples_dir,"example1_results.png"))
+savefig(joinpath(examples_dir,"example1_results.svg"))
