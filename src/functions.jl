@@ -1,6 +1,6 @@
 export BGeometry, radius, elements, points, uniform_mesh
 export load_xfoil, load_xflr5, sigma, integrate
-export linear_function, constant_function
+export nonlinear_function, linear_function, constant_function
 export calculate_vi
 export element_performance, thrust_momentum, trust_balance
 
@@ -68,6 +68,10 @@ fit_polar(data) = begin
     cl, cd
 end
 
+nonlinear_function(x_vals, y_vals) = begin
+    Spline1D(x_vals, y_vals)
+end
+
 linear_function(val_root, val_tip, radius) = begin
     (r) -> val_root + (val_tip - val_root)/radius*r
 end
@@ -133,7 +137,7 @@ calculate_vi(
     for i ∈ eachindex(r)
         args = (vc, Ω, n_blades, r[i], θ, chord, cl, cd)
         vi[i], converged = secant_solver(
-            trust_balance, 0.0, guess_range=(0.0, v_tip/2), args=args, show_convergence=show_convergence, warnings=warnings
+            trust_balance, 0.0, guess_range=(0.0, v_tip*2), args=args, show_convergence=show_convergence, warnings=warnings
             )
         if !converged
             vi[i] = 0.0

@@ -42,6 +42,7 @@ rotor = uniform_mesh(radius, nb, n)
 theta = linear_function(deg2rad(20), deg2rad(15), radius) # 20 to 7.5 degree twist
 chord = constant_function(0.035) # constant chord of 0.075
 # chord = linear_function(0.05, 0.02) # linear taper from 0.05 to 0.02 m
+# chord = nonlinear_function([0.0, 0.25, 0.5, 1.0].*radius, [0.05, 0.04, 0.04, 0.025]) 
 
 # Operating conditions
 vc = 0
