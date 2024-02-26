@@ -42,10 +42,10 @@ function secant_solver(
         end
     end
     print("Warning: Convergence criterion not met!\n")
-    print("Check 1: Input configuration is not physical (reduce RPM)\n")
+    print("Check 1: Input configuration is not physical (reduce/increase RPM or θ)\n")
     print("Check 2: Angle operating beyond range used for cl and cd (lower θ or Vc)\n")
     print("Check 3: Mesh does not have sufficient points\n")
-    print("Check 4: Solver torelance too high\n")
+    print("Check 4: Solver tolerance too high\n")
 end
 
 
