@@ -259,3 +259,4 @@ p2 = plot(
 fig = plot(p1,p2) 
 savefig(fig, "example2_results.png") # or .png, jpeg, etc. (see Plots.jl docs)
 ```
+![Example 2 - Rotor performance](examples/example2_results.svg)
