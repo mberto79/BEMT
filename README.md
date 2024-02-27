@@ -142,7 +142,6 @@ dTm = thrust_momentum(rotor, vi, vc, rho) # used here as a check
 
 # Integrate element results over the rotor blades
 T = integrate(dT, rotor.r) # Rotor thrust prediction (by BEM)
-Tm = integrate(dTm, rotor.r) # should be similar to the value of T
 Q = integrate(dQ, rotor.r) # Rotor torque prediction
 P = integrate(dP, rotor.r) # Rotor power prediction
 
