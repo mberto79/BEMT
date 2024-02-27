@@ -40,7 +40,7 @@ rotor = uniform_mesh(radius, nb, n) # returns a "meshed" rotor object
 
 # Define geometry (these are functions)
 theta = linear_function(deg2rad(20), deg2rad(15), radius) # 20 to 7.5 degree twist
-# chord = constant_function(0.035) # constant chord of 0.075
+chord = constant_function(0.035) # constant chord of 0.075
 # chord = linear_function(0.05, 0.02, rotor.radius) # linear taper from 0.05 to 0.02 m
 # chord = nonlinear_function([0.0, 0.25, 0.5, 1.0].*radius, [0.05, 0.04, 0.04, 0.025]) 
 
@@ -78,9 +78,9 @@ for (i, rpm) in enumerate(rpm_range)
     dT_all[:,i] .= dT # Store thrust distribution along span (notice "." for performance)
 
     # Integrate element results over the rotor blades
-    T[i] = integrate1(dT, rotor.r) # Rotor thrust prediction (by BEM)
-    Q[i] = integrate1(dQ, rotor.r) # Rotor torque prediction
-    P[i] = integrate1(dP, rotor.r) # Rotor power prediction
+    T[i] = integrate(dT, rotor.r) # Rotor thrust prediction (by BEM)
+    Q[i] = integrate(dQ, rotor.r) # Rotor torque prediction
+    P[i] = integrate(dP, rotor.r) # Rotor power prediction
 
 end
 
