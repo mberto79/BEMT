@@ -418,7 +418,7 @@ calculate_vi(
     )
 ```
 
-Where `theta`, `chord`, `cl` and `cd` are indeed functions of the **dimensional** radius, $r$. Using standard notation for BEMT, they can be written as $\theta(r)$, $c(r)$, $cl(r)$, etc. Any input or output that represent degrees should be given in **radians**.
+Where `theta`, `chord`, `cl` and `cd` are indeed functions of the **dimensional** radius, $r$ or angle of attach, $\alpha$, in **radians**. Using standard notation for BEMT, they can be written as $\theta(r)$, $c(r)$, $cl(\alpha)$, and $cd(\alpha)$. Any input or output that represent degrees should be given in **radians**.
 
 Besides the observations above, the ability to pass functions as arguments to a function is extremely powerful and trivially done in Julia. This feature allows `BEMT.jl` to work with arbitrarily defined rotor geometries. For example, to define a very complex rotor geometry where the chord, $c$, varies along the radius, $r$, all that is required is a function that will return the appropriate value of $c$ for a given value of $r$. To facilitate the definition of non-linear functions, this package provides the `nonlinear_function` method. For example, the code below
 
@@ -442,3 +442,11 @@ plot(
 Generates the following distribution of the chord along the span of the rotor:
 
 ![Non-linear chord definition](examples/example6_nonlinear_chord.svg)
+
+# Major limitations of `BEMT.jl`
+
+These limitations are not be addressed by design and they will not be implemented in the future, leaving students on the Aerospace course at the University of Nottingham to implement as required or device means to correct the predictions produced by this code. They include:
+
+- The code currently does not implement tip loss corrections
+- The code does not implement the ability to create surface interpolations for varying aerofoil shapes along the span, although users can readily extended/implement as needed. This means that the code considers the lift and drag coefficients as functions of $\alpha$ only i.e $cl(\alpha)$ and $cd(\alpha)$ when in practice they should be evaluated as $cl(Re,\alpha)$ and $cd(Re,\alpha)$.
+- Other limitations inherent to the BEMT method.
