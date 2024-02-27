@@ -85,7 +85,7 @@ sigma(chord, radius, nb) = begin
 end
 
 element_performance(rotor, vi, vc, rpm, ρ, cl, cd, θ, chord) = begin
-    (; r, n_blades, n_panels, n_edges) = rotor
+    (; r, n_blades, n_panels, n_edges, dr) = rotor
     dT = similar(r)
     dQ = similar(r)
     dP = similar(r)
@@ -151,7 +151,7 @@ integrate(fx, x) = begin
     n = length(fx)
     sum = zero(Float64)
     for i ∈ 1:(n-1)
-        sum += 0.5*(fx[i] + fx[i+1])*(x[i+1] - x[i])
+        sum += (fx[i] + fx[i+1])*(x[i+1] - x[i])
     end
     sum 
 end
