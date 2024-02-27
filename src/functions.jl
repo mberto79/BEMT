@@ -109,7 +109,7 @@ end
 
 thrust_momentum(rotor, vi, vc, ρ) = begin
     r = rotor.r
-    dT = zeros(eltype(r), rotor.n_edges)
+    dT = similar(r)
     for i ∈ eachindex(r)
         dT[i] = 4*π*ρ*(vc + vi[i])*vi[i]*r[i]
     end
