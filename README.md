@@ -57,7 +57,7 @@ The `BEMT.jl` package is not meant to be a production package, thus, it has not 
 add https://github.com/mberto79/BEMT.git
 ```
 
-### Update `BEMT.jl`
+### Updating `BEMT.jl`
 
 As it is common with software. It is likely that this package will be updated from time to time, for bug fixes or to add new functionality. To update your installation to a new version, first enter *package mode* by pressing "]" in the Julia REPL and then type:
 
@@ -65,9 +65,10 @@ As it is common with software. It is likely that this package will be updated fr
 update BEMT
 ```
 
-## Basic usage example
+## Example 1: Basic usage
 
 Below is an example of the basic functionality provided in `BEMT.jl` which can be readily extended to perform more complex analyses. To run the example follow these steps:
+
 - Create an empty directory in your local machine
 - Open vscode and open the directory you created
 - Create a new file (making sure to add the ".jl" file extension)
@@ -75,7 +76,8 @@ Below is an example of the basic functionality provided in `BEMT.jl` which can b
 - Execute the code. You can do this line by line by pressing the shift and enter keys (on Windows and Linux)
 
 Note the following:
-- Ensure you have installed the BEMT.jl package (see installation instruction above)
+
+- Ensure you have installed the BEMT.jl package using the process detailed below.
 - Ensure that both Julia and the Julia extension for vscode are installed.
 
 ```Julia
@@ -154,7 +156,15 @@ plot(p1,p2,p3,p4, plot_title="Rotor Performance")
 ```
 ![Example 1 - Element performance](examples/example1_results.svg)
 
-## A more advanced example: Effect of RPM
+## Example 2: Effect of RPM (the power of loops)
+
+Now that we have a simple case set up and running (example 1), in this example the power of loops is illustrated. With some minor modifications and appropriate definitions output variables, with a single loop, it is possible to explore how different variables affect the performance of the rotor. In this case the RPM will be explored. You can easily take this example and modify it to suit your design needs, exploring alternative effects e.g. changing geometry, climb speed, chord, etc.
+
+Note:
+
+- The paths shown here are relative to the directory where the package `BEMT.jl` is installed. Ideally, you would change the paths here to a location of your choice in your local hard drive. The built-in function `joinpath` provides a safe method to define paths.
+- In Julia, to access a variable that is modified inside a loop, it must first be defined outside of the loop e.g. T, Q and P in the example below.
+- The use of the plotting package `Plots.jl` is showcased here but not in detail. Refer to the package documentation for more details. 
 
 ```julia
 using Plots
@@ -260,3 +270,175 @@ fig = plot(p1,p2)
 savefig(fig, "example2_results.png") # or .png, jpeg, etc. (see Plots.jl docs)
 ```
 ![Example 2 - Rotor performance](examples/example2_results.svg)
+
+# Example 3: Writing, reading and plotting results
+
+This example shows how calculation results can be saved and loaded from file, and plotted. It must be noted that there are multiples ways that this can be achieved. It is common practice to save the data to a simple text file (csv) for further processing as these files can be process anywhere, either in Julia, Matlab, Excel, or your post-processing tool of choice.
+
+Note:
+
+- Notice that strings can be concatenated using the "*" operator e.g. "my " and "name" can be combined using the syntax "my " * "name". This can be very useful to automate your post-processing workflow
+
+```julia
+using Plots # Must be installed with "add Plots"
+using DelimitedFiles # No need to install
+
+# WRITE DATA
+
+# Example providing path with strings (not always safe in windows)
+base = "examples/data/example3/" # Change path to suit your needs
+writedlm(base*"RPM_d0.15.csv", rpm_range) # rpm_range is not a vector but a UnitRange
+writedlm(base*"T_d0.15.csv", T) # write the vector to file
+writedlm(base*"Q_d0.15.csv", Q) # "*" used to combine strings
+
+# READ/LOAD DATA
+
+# Example providing path with joinpath
+RPM_file = readdlm(joinpath(base,"RPM_d0.15.csv"))
+T_file = readdlm(joinpath(base,"T_d0.15.csv"))
+Q_file = readdlm(joinpath(base,"Q_d0.15.csv"))
+
+
+# Plot results
+p1 = plot(
+    RPM_file, T_file, 
+    label="Thrust", xlabel="RPM", ylabel="T [N]"
+    )
+p2 = plot(
+    RPM_file, Q_file,
+    label="Torque", xlabel="RPM", ylabel="Q [Nm]"
+    )
+
+# Plot with some plot attributes (see Plots.jl docs)
+plot(
+    p1,p2, 
+    framestyle=:box,
+    fg_legend=:false,
+    layout=(2,1),
+    size=(600,500)
+    ) 
+
+# save figure (change name and extension as needed e.g. "test.png")
+savefig(joinpath(examples_dir,"example3_loaded_results.svg"))
+```
+![example 3 - loaded from file](examples/example3_loaded_results.svg)
+
+## Example 4: running another case and saving results
+
+For this excercise, you must re-run the test case provided in exercise 2 above for a rotor diameter of $2\cdot10^{-2}$ $m$ and write/save the results to file using a file format that preserves the diameter information in the file name to 2 decimal places e.g. *_d123.00.
+
+Note:
+
+- This exercise demonstrate the use of string interpolation using the "$" operator inside a string i.e. "I am $years old" where years in this case is a number (but could be another string)
+
+```julia
+using Plots # Must be installed with "add Plots"
+using DelimitedFiles # No need to install
+using Printf # provides macro to format strings 
+
+d_string = @sprintf "%.2f" 25e-2 # useful macro to convert numbers to formatted strings
+
+# Example providing path with strings (not always safe in windows)
+base = "examples/data/example4/"
+writedlm(base*"RPM_d$(d_string).csv", rpm_range) # use "$" to interpolate "d_string"
+writedlm(base*"T_d$(d_string).csv", T) 
+writedlm(base*"Q_d$(d_string).csv", Q) 
+
+# Example providing path with joinpath
+RPM_file = readdlm(joinpath(base,"RPM_d$(d_string).csv"))
+T_file = readdlm(joinpath(base,"T_d$(d_string).csv"))
+Q_file = readdlm(joinpath(base,"Q_d$(d_string).csv"))
+```
+
+## Example 5: Loading and plotting previous results
+
+This example shows how previous results/files can be loaded and combined into a single file for facilitating data analysis or evaluation of results. This is a very useful skill to develop as engineers. Generating comparative plots can help tell a story in a clear manner. If done correctly, "a figure is worth a thousand words".
+
+```julia
+using DelimitedFiles
+using Printf
+
+d_string = @sprintf "%.2f" 15e-2 
+base = "examples/data/example3/"
+
+# Example providing path with joinpath
+RPM_file = readdlm(joinpath(base,"RPM_d$(d_string).csv"))
+T_file = readdlm(joinpath(base,"T_d$(d_string).csv"))
+Q_file = readdlm(joinpath(base,"Q_d$(d_string).csv"))
+
+
+# Plot results
+p1 = plot(
+    RPM_file, T_file, 
+    label="D = $d_string m", xlabel="RPM", ylabel="T [N]"
+    )
+p2 = plot(
+    RPM_file, Q_file,
+    label="D = $d_string m", xlabel="RPM", ylabel="Q [Nm]"
+    )
+
+
+d_string = @sprintf "%.2f" 25e-2 
+base = "examples/data/example4/"
+
+# Example providing path with joinpath
+RPM_file = readdlm(joinpath(base,"RPM_d$(d_string).csv"))
+T_file = readdlm(joinpath(base,"T_d$(d_string).csv"))
+Q_file = readdlm(joinpath(base,"Q_d$(d_string).csv"))
+
+
+# Plot results
+plot!(p1, RPM_file, T_file, label="D = $d_string m")
+plot!(p2, RPM_file, Q_file, label="D = $d_string m")
+
+# Plot with some plot attributes (see Plots.jl docs)
+plot(
+    p1,p2, 
+    framestyle=:box,
+    fg_legend=:false,
+    layout=(2,1),
+    size=(600,500)
+    ) 
+
+# Remember to change the path of the saved figure based on your needs
+savefig("examples/example4_combining_results.svg")
+```
+
+![Example 5- loading previous results](examples/example4_combining_results.svg)
+
+## A word about the main `calculate_vi` function
+
+In the simplest terms, the role of this function is to balance the calculation of the thrust generated when using a single element (which accounts for the aerodynamic performance of the rotor cross-sectional aerofoil) and momentum based estimations. This is done, behind the scenes, using an iterative method (secant method). Thus, users must be aware that certain rotor configurations will not be feasible (the code will issue a warning) or the numerical method is unable to converge due to its iterative nature (the same warning is issued). Typically, changing the number of elements use in the blade calculations will help (assuming the configuration is physical), alternative, users should check that the configuration is physical and/or that the functions pass to `calculate_vi` are well behaved.
+
+To elaborate on the last point above, it must be highlighted the `calculate_vi` takes is several functions as arguments. The call signature for this function is given below for reference:
+
+```julia
+calculate_vi(
+    rotor, vc, rpm, theta, chord, cl, cd, warnings=false
+    )
+```
+
+Where `theta`, `chord`, `cl` and `cd` are indeed functions of the **dimensional** radius, $r$. Using standard notation for BEMT, they can be written as $\theta(r)$, $c(r)$, $cl(r)$, etc. Any input or output that represent degrees should be given in **radians**.
+
+Besides the observations above, the ability to pass functions as arguments to a function is extremely powerful and trivially done in Julia. This feature allows `BEMT.jl` to work with arbitrarily defined rotor geometries. For example, to define a very complex rotor geometry where the chord, $c$, varies along the radius, $r$, all that is required is a function that will return the appropriate value of $c$ for a given value of $r$. To facilitate the definition of non-linear functions, this package provides the `nonlinear_function` method. For example, the code below
+
+```julia
+radius = 0.2
+
+chord = nonlinear_function(
+    [0.0, 0.25, 0.5, 1.0].*radius, [0.05, 0.04, 0.04, 0.025]
+    )
+
+r = 0.0:(radius/20):radius
+plot(
+    r, chord.(r), 
+    label="Chord distribution", 
+    xlabel="r [m]", 
+    ylabel="Chord [m]"
+    )
+
+```
+
+Generates the following distribution of the chord along the span of the rotor:
+
+![Non-linear chord definition](examples/example6_nonlinear_chord.svg)
