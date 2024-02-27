@@ -205,13 +205,13 @@ nb = 3 # number of blades
 
 # Define mesh for BET
 n = 100
-rotor = uniform_mesh(radius, nb, n)
+rotor = uniform_mesh(radius, nb, n) # returns a "meshed" rotor object
 
 # Define geometry (these are functions)
 theta = linear_function(deg2rad(20), deg2rad(15), radius) # 20 to 7.5 degree twist
 chord = constant_function(0.035) # constant chord of 0.075
-# chord = linear_function(0.05, 0.02) # linear taper from 0.05 to 0.02 m
-# chord = nonlinear_function([0.0, 0.25, 0.5, 1.0].*radius, [0.05, 0.04, 0.04, 0.025])
+# chord = linear_function(0.05, 0.02, rotor.radius) # linear taper from 0.05 to 0.02 m
+# chord = nonlinear_function([0.0, 0.25, 0.5, 1.0].*radius, [0.05, 0.04, 0.04, 0.025]) 
 
 # Operating conditions
 vc = 0
@@ -224,6 +224,7 @@ rpm_range = 100:100:5000 # We want to loop over the RPM variable
 T = zeros(length(rpm_range))
 Q = zeros(length(rpm_range))
 P = zeros(length(rpm_range))
+dT_all = zeros(elements(rotor),length(rpm_range))
 last_iter = length(rpm_range)
 
 for (i, rpm) in enumerate(rpm_range)
@@ -243,12 +244,12 @@ for (i, rpm) in enumerate(rpm_range)
 
     # Calculate aerodynamic performance
     dT, dQ, dP = element_performance(rotor, vi, vc, rpm, rho, cl, cd, theta, chord)
+    dT_all[:,i] .= dT # Store thrust distribution along span (notice "." for performance)
 
     # Integrate element results over the rotor blades
-
     T[i] = integrate(dT, rotor.r) # Rotor thrust prediction (by BEM)
     Q[i] = integrate(dQ, rotor.r) # Rotor torque prediction
-    # P[i] = integrate(dP, rotor.r) # Rotor power prediction
+    P[i] = integrate(dP, rotor.r) # Rotor power prediction
 
 end
 
@@ -261,13 +262,23 @@ p2 = plot(
     rpm_range[1:last_iter], Q[1:last_iter], 
     label="Torque", xlabel="RPM", ylabel="Q [Nm]"
     )
-# p3 = plot(
-#     rpm_range[1:last_iter], P[1:last_iter], 
-#     label="Power", xlabel="RPM", ylabel="Q [W]"
-#     )
+p3 = plot(
+    rpm_range[1:last_iter], P[1:last_iter], 
+    label="Power", xlabel="RPM", ylabel="Q [W]"
+    )
 
-fig = plot(p1,p2) 
-savefig(fig, "example2_results.png") # or .png, jpeg, etc. (see Plots.jl docs)
+p4 = plot()
+for (i, rpm) in enumerate(rpm_range)
+    plot!(
+        p4, rotor.r, dT_all[:,i], 
+        xlabel="Radius [m]", ylabel="Thurst [N/m]", legend=false)
+end
+
+rpm_range[1:10:end]
+
+plot(p1,p2,p3,p4) 
+
+# savefig(joinpath(examples_dir,"example2_results.svg"))
 ```
 ![Example 2 - Rotor performance](examples/example2_results.svg)
 
