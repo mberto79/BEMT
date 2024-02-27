@@ -5,12 +5,12 @@ export calculate_vi
 export element_performance, thrust_momentum, trust_balance
 
 struct BGeometry{I<:Integer,F<:AbstractFloat,V<:AbstractArray} 
-    n_blades::I
-    n_panels::I
-    n_edges::I
-    r::V
-    radius::F
-    dr::F
+    n_blades::I # rotor blades
+    n_panels::I # number of panels/elements in mesh
+    n_edges::I # number of edges in mesh
+    r::V # vector of coordinate along radius
+    radius::F # radius of rotor
+    dr::F # space between mesh points
 end
 
 # BGeometry access functions

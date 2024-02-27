@@ -443,7 +443,7 @@ Generates the following distribution of the chord along the span of the rotor:
 
 ![Non-linear chord definition](examples/example6_nonlinear_chord.svg)
 
-# Major limitations of `BEMT.jl`
+# Some limitations of `BEMT.jl`
 
 These limitations are not be addressed by design and they will not be implemented in the future, leaving students on the Aerospace course at the University of Nottingham to implement as required or device means to correct the predictions produced by this code. They include:
 

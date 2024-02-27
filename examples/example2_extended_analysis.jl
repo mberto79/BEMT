@@ -36,12 +36,12 @@ nb = 3 # number of blades
 
 # Define mesh for BET
 n = 100
-rotor = uniform_mesh(radius, nb, n)
+rotor = uniform_mesh(radius, nb, n) # returns a "meshed" rotor object
 
 # Define geometry (these are functions)
 theta = linear_function(deg2rad(20), deg2rad(15), radius) # 20 to 7.5 degree twist
 # chord = constant_function(0.035) # constant chord of 0.075
-chord = linear_function(0.05, 0.02, rotor.radius) # linear taper from 0.05 to 0.02 m
+# chord = linear_function(0.05, 0.02, rotor.radius) # linear taper from 0.05 to 0.02 m
 # chord = nonlinear_function([0.0, 0.25, 0.5, 1.0].*radius, [0.05, 0.04, 0.04, 0.025]) 
 
 # Operating conditions
@@ -109,4 +109,4 @@ rpm_range[1:10:end]
 
 plot(p1,p2,p3,p4) 
 
-savefig(joinpath(examples_dir,"example2_results.svg"))
+# savefig(joinpath(examples_dir,"example2_results.svg"))
