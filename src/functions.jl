@@ -151,7 +151,7 @@ integrate(fx, x) = begin
     n = length(fx)
     sum = zero(Float64)
     for i ∈ 1:(n-1)
-        sum += (fx[i] + fx[i+1])*(x[i+1] - x[i])
+        sum += 0.5*(fx[i] + fx[i+1])*(x[i+1] - x[i])
     end
     sum 
 end
